@@ -1,0 +1,48 @@
+{
+  "groups": [
+    {
+      "name": "promptshield",
+      "type": "io.promptshield.spring.PromptShieldProperties",
+      "sourceType": "io.promptshield.spring.PromptShieldProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "promptshield.config-source",
+      "type": "java.lang.String",
+      "description": "Path to the rules JSON file. Accepts: \"classpath:\/rules.json\", \"\/absolute\/path.json\", \"https:\/\/...\" Leave blank to use the bundled defaults.",
+      "sourceType": "io.promptshield.spring.PromptShieldProperties"
+    },
+    {
+      "name": "promptshield.drift-threshold",
+      "type": "java.lang.Double",
+      "description": "Context drift threshold for ContextModule.",
+      "sourceType": "io.promptshield.spring.PromptShieldProperties"
+    },
+    {
+      "name": "promptshield.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable the library entirely.",
+      "sourceType": "io.promptshield.spring.PromptShieldProperties"
+    },
+    {
+      "name": "promptshield.hot-reload-interval",
+      "type": "java.lang.Long",
+      "description": "Reload rules every N seconds (0 = disabled).",
+      "sourceType": "io.promptshield.spring.PromptShieldProperties"
+    },
+    {
+      "name": "promptshield.injection-threshold",
+      "type": "java.lang.Double",
+      "description": "Score threshold above which a prompt is classified as INJECTION.",
+      "sourceType": "io.promptshield.spring.PromptShieldProperties"
+    },
+    {
+      "name": "promptshield.similarity-threshold",
+      "type": "java.lang.Double",
+      "description": "Cosine similarity threshold for EmbeddingModule.",
+      "sourceType": "io.promptshield.spring.PromptShieldProperties"
+    }
+  ],
+  "hints": []
+}
