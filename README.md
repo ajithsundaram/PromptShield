@@ -258,7 +258,3 @@ mvn clean test
 Tests cover benign inputs, classic injection attacks, semantic attacks, context drift, and the vectorization pipeline.
 
 ---
-
-## License
-
-[Add your license here]
