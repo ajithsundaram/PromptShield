@@ -2,6 +2,8 @@ package io.promptshield.core;
 
 import io.promptshield.config.ConfigLoader;
 import io.promptshield.config.RuleConfig;
+import io.promptshield.embedding.EmbeddingProvider;
+import io.promptshield.embedding.OllamaEmbeddingProvider;
 import io.promptshield.embedding.VectorStore;
 import io.promptshield.module.ContextModule;
 import io.promptshield.module.DetectionModule;
@@ -113,6 +115,9 @@ public class PromptShield {
         private double similarityThreshold = 0.65;
         private double driftThreshold      = 0.15;
 
+        /** When set, replaces TF-IDF with LLM embeddings in both EmbeddingModule and ContextModule. */
+        private EmbeddingProvider embeddingProvider = null;
+
         private ConfigLoader configLoader;
         private final List<DetectionModule> extraModules = new ArrayList<>();
         private boolean disableDefaultModules = false;
@@ -159,6 +164,37 @@ public class PromptShield {
             return this;
         }
 
+        /**
+         * Use a custom {@link EmbeddingProvider} for semantic similarity and context-drift detection.
+         * Replaces the default TF-IDF vectorizer.
+         */
+        public Builder embeddingProvider(EmbeddingProvider provider) {
+            this.embeddingProvider = provider;
+            return this;
+        }
+
+        /**
+         * Use Ollama for embeddings with default settings
+         * (http://localhost:11434, model: nomic-embed-text).
+         *
+         * Prerequisites:
+         *   ollama serve
+         *   ollama pull nomic-embed-text
+         */
+        public Builder ollamaEmbedding() {
+            return embeddingProvider(new OllamaEmbeddingProvider());
+        }
+
+        /**
+         * Use Ollama for embeddings with a custom base URL and model.
+         *
+         * @param baseUrl  e.g. "http://localhost:11434"
+         * @param model    e.g. "nomic-embed-text" or "mxbai-embed-large"
+         */
+        public Builder ollamaEmbedding(String baseUrl, String model) {
+            return embeddingProvider(new OllamaEmbeddingProvider(baseUrl, model));
+        }
+
         public PromptShield build() {
             configLoader = new ConfigLoader(configSource);
             if (hotReloadInterval > 0) configLoader.enableHotReload(hotReloadInterval);
@@ -170,13 +206,17 @@ public class PromptShield {
                     ? cfg.getAttackEmbeddings()
                     : defaultAttackTexts();
 
-            VectorStore vectorStore = new VectorStore(attackTexts);
+            VectorStore vectorStore = embeddingProvider != null
+                    ? new VectorStore(attackTexts, embeddingProvider)
+                    : new VectorStore(attackTexts);
 
             List<DetectionModule> modules = new ArrayList<>();
             if (!disableDefaultModules) {
                 modules.add(new RuleBasedModule(configLoader));
                 modules.add(new EmbeddingModule(vectorStore, similarityThreshold));
-                modules.add(new ContextModule(driftThreshold));
+                modules.add(embeddingProvider != null
+                        ? new ContextModule(driftThreshold, embeddingProvider)
+                        : new ContextModule(driftThreshold));
             }
             modules.addAll(extraModules);
 

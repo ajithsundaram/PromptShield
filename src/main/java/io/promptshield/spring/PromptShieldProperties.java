@@ -41,6 +41,19 @@ public class PromptShieldProperties {
     /** Reload rules every N seconds (0 = disabled). */
     private long hotReloadInterval = 0;
 
+    /**
+     * Base URL of a local Ollama instance for LLM-backed embeddings.
+     * Leave blank to use the built-in TF-IDF vectorizer instead.
+     * Example: "http://localhost:11434"
+     */
+    private String ollamaUrl = "";
+
+    /**
+     * Ollama embedding model to use (only applies when ollama-url is set).
+     * Run "ollama pull nomic-embed-text" before starting the application.
+     */
+    private String ollamaModel = "nomic-embed-text";
+
     // ---- getters / setters ----
 
     public boolean isEnabled()             { return enabled; }
@@ -60,4 +73,10 @@ public class PromptShieldProperties {
 
     public long getHotReloadInterval()        { return hotReloadInterval; }
     public void setHotReloadInterval(long v)  { this.hotReloadInterval = v; }
+
+    public String getOllamaUrl()              { return ollamaUrl; }
+    public void setOllamaUrl(String v)        { this.ollamaUrl = v; }
+
+    public String getOllamaModel()            { return ollamaModel; }
+    public void setOllamaModel(String v)      { this.ollamaModel = v; }
 }
